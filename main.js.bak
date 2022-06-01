@@ -189,31 +189,6 @@ class MyPlugin extends obsidian.Plugin {
     onload() {
         console.log(t('loadThisPlugin'));
 
-        // sncg    --20220530_190718
-        this.addCommand(
-            {
-                id:'delete-paragraph-plus',
-                name:'Delete Paragraph Plus',
-                callback:()=>this.deleteParagraphPlus(),
-                hotkeys:[{modifiers: ["Alt"], key: "D"}]   
-            }
-        );
-
-
-
-        // sncg cnsg --20220528_234646
-        this.addCommand(
-            {
-                id:'change-cn-square-brackets-to-head',
-                name:'Change All Chinese Square Brackets to Head',
-                callback:()=>this.ChangeCnSquareBrackets2head(),
-                hotkeys:[{modifiers: ["Alt"], key: "T"}]            
-            }
-        );
-
-
-
-
         this.addCommand({
             id: 'internal-link',
             name: '[[链接]]语法',
@@ -1530,26 +1505,18 @@ class MyPlugin extends obsidian.Plugin {
     };
 
     批量转换内链() {
-/*        let fileNameAry = [];
+        let fileNameAry = [];
         for (const file of this.app.vault.getMarkdownFiles()) {
             fileNameAry.push(file.basename);
         };
         fileNameAry.sort().reverse();
-*/
-        ///console.log(fileNameAry); cnsg,此处应加提醒，此命令是对库中全部文件操作,将此前的都注释掉
-
         this.获取编辑器信息 ();
-        console.log("笔记正文:"+笔记正文);
         笔记正文 = 笔记正文.replace(/(?<=\[\[[^\[\]]*)([^\[\]])(?=[^\[\]]*\]\])/g,"$1⚘");
         for (const oldStr of fileNameAry){
-            console.log("oldStr"+oldStr);
             let xinStr = oldStr.replace(/([^⚘])/g,"$1⚘");  //⚘
             笔记正文 = 笔记正文.replace(oldStr,"[["+xinStr+"]]");
-            console.log("xinStr"+xinStr);
-            console.log("笔记正文:"+笔记正文);
         };
         笔记正文 = 笔记正文.replace(/⚘/g,"");
-        console.log("笔记正文:"+笔记正文);
         this.替换笔记正文(笔记正文);
         new obsidian.Notice("潜在链接已全部转换！\n可以 Ctrl+Z 撤消。");
     };
@@ -2071,7 +2038,6 @@ class MyPlugin extends obsidian.Plugin {
         if(当前行文本!=""){
             编辑模式.setSelection({line:当前行号,ch:0}, {line:当前行号,ch:当前行文本.length});
         };
-        console.log("选择当前整段")
     };
 
     选择当前整句 () {
@@ -2245,6 +2211,7 @@ class MyPlugin extends obsidian.Plugin {
     };
 
     标题语法(_str) {
+
         let link = eval("/^"+_str+" ([^#]+)/");	//是否包含几个#符号
         this.获取编辑器信息 ();
         //console.log("获取编辑器信息："+this.获取编辑器信息());
@@ -2257,20 +2224,25 @@ class MyPlugin extends obsidian.Plugin {
             新文本 = 当前行文本.replace(link,"$1");
             新定位 = 选至行首.replace(link,"$1");
         }*/else{  //不管是标题还是普通文本，都转为标题
-            新文本 = 当前行文本.replace(/^(\>*(\[[!\w]+\])?\s*)(#+\s)?/m,"$1"+_str+" ");
-            新定位 = 选至行首.replace(/^(\>*(\[[!\w]+\])?\s*)(#+\s)?/m,"$1"+_str+" ");
 
-            ///console.log("当前行文本："+当前行文本);
-            ///console.log("选至行首："+选至行首);
-            ///新文本 = 当前行文本.replace(/^(\>*(\[[!\w]+\])?\s*)(#+\s)?/m,_str+" ");
-            ///console.log("_str："+_str);            
-            ///console.log("新文本："+新文本);
-            ///新定位 = 选至行首.replace(/^(\>*(\[[!\w]+\])?\s*)(#+\s)?/m,_str+" ");
-            ///console.log("新定位："+新定位);
+
+
+            console.log("当前行文本："+当前行文本);
+            console.log("选至行首："+选至行首);
+
+
+
+            新文本 = 当前行文本.replace(/^(\>*(\[[!\w]+\])?\s*)(#+\s)?/m,_str+" ");
+            console.log("_str："+_str);            
+            console.log("新文本："+新文本);
+            新定位 = 选至行首.replace(/^(\>*(\[[!\w]+\])?\s*)(#+\s)?/m,_str+" ");
+            console.log("新定位："+新定位);
+
             新文本 = 新文本.replace(/【\d+】/g,""); //包含【\d+】格式则去除 cnsg --20220516114132
             console.log("新文本："+新文本);
             新定位 =新定位.replace(/【\d+】/g,""); 
             console.log("新定位："+新定位);
+
         }
         笔记全文.replaceRange(新文本, {line:当前行号,ch:0}, {line:当前行号,ch:当前行文本.length});
         编辑模式.setCursor({line:当前行号,ch:新定位.length});
@@ -2370,8 +2342,8 @@ class MyPlugin extends obsidian.Plugin {
                 new obsidian.Notice("已关闭格式刷！");
             }else{
                 //new obsidian.Notice("请先划选部分文本，再执行命令！");
-                let reg1 = /(~~|%%|==|\*\*?|\<[^\<\>]*?\>|!?\[\[*|`|!?\[)([^!#=\[\]\<\>\`_\*~\(\)]*)$/; //cnsg. 删去一个`|_`,--20220517134426， 原始为：                let reg1 = /(~~|%%|==|\*\*?|\<[^\<\>]*?\>|!?\[\[*|`|_|!?\[)([^!#=\[\]\<\>\`_\*~\(\)]*)$/;
-                let reg2 = /^([^!=\[\]\<\>\`_\*~\(\)]*)(~~|%%|==|\*\*?|\<[^\<\>]*\>|\]\]|`|\]\([^\(\)\[\]]*\))/; //cnsg. 删去一个`|_`, --20220517134447，原始为：                let reg2 = /^([^!=\[\]\<\>\`_\*~\(\)]*)(~~|%%|==|\*\*?|\<[^\<\>]*\>|\]\]|`|_|\]\([^\(\)\[\]]*\))/;
+                let reg1 = /(~~|%%|==|\*\*?|\<[^\<\>]*?\>|!?\[\[*|`|_|!?\[)([^!#=\[\]\<\>\`_\*~\(\)]*)$/;
+                let reg2 = /^([^!=\[\]\<\>\`_\*~\(\)]*)(~~|%%|==|\*\*?|\<[^\<\>]*\>|\]\]|`|\]\([^\(\)\[\]]*\))/;
                 if(选至行首.match(reg1)!=null && 选至行尾.match(reg2)!=null){
                     选至行首 = 选至行首.replace(reg1,"$2");
                     选至行尾 = 选至行尾.replace(reg2,"$1");
@@ -2386,7 +2358,7 @@ class MyPlugin extends obsidian.Plugin {
             所选文本 = 所选文本.replace(/\!?\[\[([^\[\]\|]*\|)*([^\(\)\[\]]+)\]\]/g,"$2");
             所选文本 = 所选文本.replace(/\!?\[+([^\[\]\(\)]+)\]+\(([^\(\)]+)\)/g,"$1");
             所选文本 = 所选文本.replace(/`([^`]+)`/g,"$1");
-            //所选文本 = 所选文本.replace(/_([^_]+)_/g,"$1"); //cnsg. 避免`20220501_230027652_Sun`中的下划线被删除，--20220517134354
+            //所选文本 = 所选文本.replace(/_([^_]+)_/g,"$1");
             所选文本 = 所选文本.replace(/==([^=]+)==/g,"$1");
             所选文本 = 所选文本.replace(/\*\*?([^\*]+)\*\*?/g,"$1");
             所选文本 = 所选文本.replace(/~~([^~]+)~~/g,"$1");
@@ -2564,7 +2536,7 @@ class MyPlugin extends obsidian.Plugin {
     指定当前文件名 () {
         this.获取编辑器信息 ();
         当前文件路径 = this.app.workspace.getActiveFile().path;        
-        ///console.log("path："+当前文件路径);
+        console.log("path："+当前文件路径);
 
         //当前文件路径2=this.app.workspace.getActiveFile().FilePaths;
         //console.log("FilePaths："+当前文件路径2);
@@ -2572,24 +2544,21 @@ class MyPlugin extends obsidian.Plugin {
         //当前文件路径3= this.获取相对路径();
         //console.log("当前文件路径3："+当前文件路径3);
         //debugger;
+
         if (所选文本 == ""){return};
         //navigator.clipboard.writeText(所选文本);
-        //this.app.workspace.activeLeaf.replaceSelection(所选文本);  
+        //this.app.workspace.activeLeaf.replaceSelection(所选文本);
 
-        ///this.app.vault.adapter.rename(当前文件路径, 所选文本+".md"); ///注释了原程序两行 cnsg.20220516_132848395_Mon
-        ///console.log(当前文件路径+"\n"+所选文本);
-
-        let 相对目录 = 当前文件路径.replace(/(?<=\/)[^\/]+$/m,"");  ///此处如果不加相对路径，重命名后的文件都自动置于根目录,cnsg.20220516_132848395_Mon
-
-        ///this.app.vault.adapter.rename(当前文件路径, 相对目录+所选文本+".md"); 
-        this.app.vault.adapter.rename(当前文件路径, 相对目录+所选文本+".md"); 
-        console.log("原文件："+当前文件路径);
+        let 相对目录 = 当前文件路径.replace(/(?<=\/)[^\/]+$/m,"");
+        this.app.vault.adapter.rename(当前文件路径, 相对目录+所选文本+".md"); //强行重命名，不能全局更新
+        console.log("原文件："+相对目录+所选文本+".md");
         console.log("新文件："+相对目录+所选文本+".md");
     };
 
     获取相对路径 () {
         当前文件 = this.app.workspace.getActiveFile();
         当前文件路径 = 当前文件.path;
+
         //console.log(当前文件+"\n"+当前文件路径)
         //navigator.clipboard.writeText(当前文件路径)
         let 相对目录 = 当前文件路径.replace(/(?<=\/)[^\/]+$/m,"");
@@ -2837,7 +2806,7 @@ class MyPlugin extends obsidian.Plugin {
     批量去除空行() {
         this.获取编辑器信息 ();
         if (!笔记正文) return;
-        笔记正文 = 笔记正文.replace(/(\r\n|\n)[\t\s]*(\r\n|\n)/g,"\n\n"); //cnsg, "\n"-->"\n\n"  
+        笔记正文 = 笔记正文.replace(/(\r\n|\n)[\t\s]*(\r\n|\n)/g,"\n");
         this.替换笔记正文 (笔记正文);
     };
 
@@ -3024,7 +2993,7 @@ class MyPlugin extends obsidian.Plugin {
             笔记正文 = 笔记正文.replace(eval("/"+简体字表[i]+"/g"),繁体字表[i]);
         }
         this.替换笔记正文 (笔记正文);
-    };
+    }
 
     繁体转简() {
         笔记正文 = this.获取笔记正文();
@@ -3033,85 +3002,7 @@ class MyPlugin extends obsidian.Plugin {
             笔记正文 = 笔记正文.replace(eval("/"+繁体字表[i]+"/g"),简体字表[i]);
         }
         this.替换笔记正文 (笔记正文);
-    };
-
-// 将方括号开始的一行文字设为标题, for me only, 
-    ChangeCnSquareBrackets2head(){
-
-        const reCnSquareBrackets=/^\s?【\d+】(.*)/g; //【\d+】前面有时有一个空格
-        const reHyperlink=/(.*)(\[[^\]]*\]\([^\(]+\))(.*)/; //包含链接，three groups,此处不能用//g,否则exec()结果 为null
-        const reLine=/[\r\n]/g;
-        var noteArray=new Array();
-        var reArray=new Array();
-        var boolTest1=new Boolean();
-        var boolTest2=new Boolean();
-
-        this.获取编辑器信息 ();
-        if(笔记正文==null){return};
-        //console.log("笔记正文:"+笔记正文);
-
-        noteArray=笔记正文.split(reLine);
-        //console.log(noteArray);
-
-        笔记正文="";
-        for (var i=0;i<noteArray.length;i++){
-            //console.log("line:"+noteArray[i]);
-            boolTest1=reCnSquareBrackets.test(noteArray[i]);            
-            console.log("previous length:"+noteArray.length)  //length
-
-            if (boolTest1==true){                
-                boolTest2=reHyperlink.test(noteArray[i]);  
-                if (boolTest2==true){                       //include hyperlink
-                    //console.log(i+" hyper link true."+noteArray[i]);
-                    reArray=reHyperlink.exec(noteArray[i]);
-                    //console.log("\nreArray:"+reArray);
-                    if (reArray[1]!=null && reArray[3]!=null){
-                        noteArray[i]=noteArray[i].replace(reHyperlink,"$1"+" "+"$3");
-                    } else{
-                        noteArray[i]=noteArray[i].replace(reHyperlink,"H1"); //if $1="" and $3=""
-                    }
-                    noteArray.splice(i+1,0,reArray[2]);    //add item 
-                    console.log("length now:"+noteArray.length); //length
-                }
-                noteArray[i]=noteArray[i].replace(reCnSquareBrackets,"# "+"$1"); //at last, set H 1
-            }
-            //console.log("newline:"+noteArray[i]);
-        }
-        //console.log(noteArray);
-        笔记正文=noteArray.join("\r\n"); 
-        this.替换笔记正文(笔记正文);
-    };       
-
-    // 加强版，先判断是否H1，如果 是H1，直接循环直接删到出现 下一个H1才终止
-        deleteParagraphPlus(){
-            console.log("Start deleteParagraphPlus()");
-            const reH1=/^# .*/g;
-            var boolH1=new Boolean(); 
-
-            this.获取编辑器信息 ();
-            boolH1=reH1.test(当前行文本);
-            this.删除当前段落();
-            
-            
-            if (boolH1===true){
-                this.获取编辑器信息 ();                
-                //console.log("judging "+当前行文本);
-                boolH1=reH1.test(当前行文本);
-                while (boolH1!==true){
-                    //console.log("Deleted "+当前行文本);
-                    this.删除当前段落();   
-                       
-                    this.获取编辑器信息 ();
-                    boolH1=reH1.test(当前行文本);                             
-                }  
-                //console.log("Now stoped before H1: "+当前行文本);                
-            }else{
-                //console.log("Done ");  
-            };
-
-        };
-
-
+    }
 }
 
 class editSettingsTab extends obsidian.PluginSettingTab {
